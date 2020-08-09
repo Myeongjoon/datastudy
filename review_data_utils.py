@@ -136,10 +136,10 @@ def load_and_parse_review_data(base_dir,file_name = USER_REVIEW_DATA):
     print(df_rdd.take(3))
 
     def convert_row(row):
-        user_id = int(row.user_id)
-        business_id = int(row.business_id)
-        star = int(row.star)
-        return (user_id, business_id, star)
+        user_id = str(row.user_id)
+        business_id = str(row.business_id)
+        stars = float(row.stars)
+        return (user_id, business_id, stars)
 
     converted_df_rdd = df_rdd.map(convert_row)
     print(converted_df_rdd.take(3))
