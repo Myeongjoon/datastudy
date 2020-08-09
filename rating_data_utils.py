@@ -27,32 +27,32 @@ class RatingDataBuilderForCity:
             raw_business_id = sp[1].strip()
             b = bizid_to_index_map[raw_business_id]
             indexed_business_ids.append(b)
-        print "indexed_business_ids populated!"
+        print ("indexed_business_ids populated!")
         return indexed_business_ids
 
     def __get_and_write_userid_businessid_star_tuple_in_city(self, indexed_business_ids, tuple_df_entire_biz):
-        print "convert python list to rdd"
+        print ("convert python list to rdd")
         bid_rdd = self.spark_context.parallelize(indexed_business_ids)
 
-        print "add a header row to the rdd such that later I can do dataframe join"
+        print ("add a header row to the rdd such that later I can do dataframe join")
         row = Row("business_id_in_one_city")
         b_df = bid_rdd.map(row).toDF()
 
-        print "inner join the entire business df with the small df (local businesses in one city)"
+        print ("inner join the entire business df with the small df (local businesses in one city)")
         joined = tuple_df_entire_biz.join(b_df, tuple_df_entire_biz.business_id==b_df.business_id_in_one_city, 'inner')
         df_tuple_for_one_city = joined.select('user_id', 'business_id', 'star')
 
         file_name = "userid_businessid_star_tuple.csv"
         csv_full_path = os.path.join(self.base_dir, self.city_name, file_name)
 
-        print "write tuple to {}".format(csv_full_path)
+        print ("write tuple to {}".format(csv_full_path))
         df_tuple_for_one_city.write.csv(csv_full_path)
-        print "Done! tuple written for city {}!".format(self.city_name)
+        print ("Done! tuple written for city {}!".format(self.city_name))
         
     def process_one_city(self, bizid_to_index_map, tuple_df_entire_biz):
-        print "Processing {}".format(self.city_name)
+        print ("Processing {}".format(self.city_name))
         indexed_business_ids = self.__get_indexed_business_ids_for_city(bizid_to_index_map)
-        print "total businesses in {}: {}".format(self.city_name, len(indexed_business_ids))
+        print (")total businesses in {}: {}".format(self.city_name, len(indexed_business_ids)))
         self.__get_and_write_userid_businessid_star_tuple_in_city(indexed_business_ids, tuple_df_entire_biz)
 
 
@@ -60,13 +60,13 @@ class RatingDataBuilderForCity:
 def load_userid_to_index_map():
     with open('/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/userid_to_index_map.json', 'r') as fp:
         userid_to_index_map = json.load(fp)
-        print "userid_to_index_map json file loaded!"
+        print ("userid_to_index_map json file loaded!")
     return userid_to_index_map
 
 def load_bizid_to_index_map():
     with open('/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/bizid_to_index_map.json', 'r') as fp:
         bizid_to_index_map = json.load(fp)
-        print "json file loaded!"
+        print ("json file loaded!")
     return bizid_to_index_map
 
 # ---------------------------------------------------------------------------
@@ -98,10 +98,10 @@ def build_rating_df_for_all_cities(spark_context, sql_context,
         return (new_user_id, new_business_id, stars)
 
     converted_ratings_data = ratings_data.rdd.map(convert_row).cache()
-    print converted_ratings_data.count()
-    print "converted_ratings_data done"
+    print (converted_ratings_data.count())
+    print ("converted_ratings_data done")
 
-    print "prepare converted_ratings_data dafaframe ..."
+    print ("prepare converted_ratings_data dafaframe ...")
     parsed_ratingdata_for_all_cities = sql_context.createDataFrame(converted_ratings_data, ['user_id', "business_id", "star"])
     parsed_ratingdata_for_all_cities.printSchema()
 
@@ -120,7 +120,7 @@ def load_and_parse_ratingdata_for_city(city_name, base_dir, spark_session):
         df = spark_session.read.csv(path=csv_full_path, sep=u",", schema=ratingSchema)
 
         df_rdd = df.rdd
-        print df_rdd.take(3)
+        print (df_rdd.take(3))
 
         def convert_row(row):
             user_id = int(row.user_id)
@@ -129,5 +129,5 @@ def load_and_parse_ratingdata_for_city(city_name, base_dir, spark_session):
             return (user_id, business_id, star)
 
         converted_df_rdd = df_rdd.map(convert_row)
-        print converted_df_rdd.take(3)
+        print (converted_df_rdd.take(3))
         return converted_df_rdd

@@ -39,6 +39,6 @@ for city_name in city_names:
     builder = RatingDataBuilderForCity(city_name, base_dir, sc)
     builder.process_one_city(bizid_to_index_map, parsed_ratingdata_all_cities)
 
-print "The rating data of all {} cities were successfully processed!".format(len(city_names))
+print ("The rating data of all {} cities were successfully processed!".format(len(city_names)))
 
 
