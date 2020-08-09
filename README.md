@@ -1,14 +1,7 @@
-# Yelper: A Collaborative Filtering Based Recommendation System
+# DataStudy
 
-Chuan Sun 
-
-[chuansun76 at gmail dot com]
-
-[twitter.com/sundeepblue]
-
-Blog: https://chuansun76.com/2016/09/25/yelper-a-collaborative-filtering-based-recommendation-system/
-
-This README file describes several major component of the "Yelper", a business recommendation system built mainly in Python using Spark framework.
+brew install apache-spark
+https://www.tutorialkart.com/apache-spark/how-to-install-spark-on-mac-os/
 
 Below are some features of the "Yelper":
 
