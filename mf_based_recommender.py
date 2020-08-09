@@ -12,7 +12,7 @@ class MFBasedRecommender:
         return model.recommendProducts(user_id, topk)
 
 def load_model(spark_context, recommender):
-    base_dir = "/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/split_business_data_by_city/"
+    base_dir = "./data/yelp_data/split_business_data_by_city/"
     city_name = "us_charlotte"
     model_file_name = "business_recomm_model_for_{}".format(city_name)
     model_full_path = os.path.join(base_dir, city_name, "mf_based_models", model_file_name)
@@ -22,7 +22,7 @@ def load_model(spark_context, recommender):
 def recommend_for_one_user(spark_context, rec):
     model = load_model(spark_context, rec)
     user_id = 10336396
-    print rec.recommend_business_for_user(model, user_id, topk=50)
+    print (rec.recommend_business_for_user(model, user_id, topk=50))
 
 # appName = "Yelper Recommendation System Trainer"
 # conf = SparkConf().setAppName(appName).setMaster("local")

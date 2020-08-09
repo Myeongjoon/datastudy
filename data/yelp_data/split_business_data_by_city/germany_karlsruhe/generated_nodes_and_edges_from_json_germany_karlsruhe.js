@@ -1,2 +1,0 @@
-var nodes = []
-var edges = []

@@ -1,7 +1,7 @@
 import os
 import math
 from pyspark.sql import Row
-from rating_data_utils import *
+from review_data_utils import *
 from pyspark.sql import SparkSession
 #from pyspark.sql.types import *
 from pyspark.sql import SQLContext
@@ -11,22 +11,21 @@ from pyspark.mllib.recommendation import ALS
 
 class MFBasedRecommendationTrainer:
 
-    def __init__(self, city_name, base_dir, spark_context, sql_context, spark_session):
-        self.city_name = city_name
+    def __init__(self, base_dir, spark_context, sql_context, spark_session):
         self.base_dir = base_dir
         self.spark_context = spark_context
         self.sql_context = sql_context
 
     def __split_data(self, df_rdd): 
         # split rating data it into train, validation, and test datasets
-        training_RDD, validation_RDD, test_RDD = df_rdd.randomSplit([6, 2, 2], seed=0L)
+        training_RDD, validation_RDD, test_RDD = df_rdd.randomSplit([6, 2, 2], seed=0)
         validation_for_predict_RDD = validation_RDD.map(lambda x: (x[0], x[1]))
         test_for_predict_RDD = test_RDD.map(lambda x: (x[0], x[1]))
-        print validation_RDD.take(10)
+        print (validation_RDD.take(10))
         return (training_RDD, validation_RDD, test_RDD, validation_for_predict_RDD, test_for_predict_RDD)
 
     def get_best_model(self, df_rdd):
-        seed = 5L
+        seed = 5
         iterations = 10
         regularization_parameter = 0.1
         ranks = [4, 8, 12]
@@ -53,14 +52,14 @@ class MFBasedRecommendationTrainer:
             error = math.sqrt(rates_and_preds.map(lambda r: (r[1][0] - r[1][1])**2).mean())
             errors[err] = error
             err += 1
-            print 'For rank %s the RMSE is %s' % (rank, error)
+            print ('For rank %s the RMSE is %s' % (rank, error))
             if error < min_error:
                 min_error = error
                 best_rank = rank
 
-        print 'The best model was trained with rank %s' % best_rank
-        print predictions.take(3)
-        print rates_and_preds.take(3)
+        print ('The best model was trained with rank %s' % best_rank)
+        print (predictions.take(3))
+        print (rates_and_preds.take(3))
 
         # get the testing data RMSE
         best_model = ALS.train(training_RDD, best_rank, seed=seed, iterations=iterations,
@@ -68,7 +67,7 @@ class MFBasedRecommendationTrainer:
         predictions = best_model.predictAll(test_for_predict_RDD).map(lambda r: ((r[0], r[1]), r[2]))
         rates_and_preds = test_RDD.map(lambda r: ((int(r[0]), int(r[1])), float(r[2]))).join(predictions)
         error = math.sqrt(rates_and_preds.map(lambda r: (r[1][0] - r[1][1])**2).mean())
-        print 'For testing data the RMSE is %s' % (error)
+        print ('For testing data the RMSE is %s' % (error))
         return best_model
 
     def export_model(self, model):
@@ -77,7 +76,7 @@ class MFBasedRecommendationTrainer:
         model_file_name = "business_recomm_model_for_{}".format(self.city_name)
         model_full_path = os.path.join(self.base_dir, self.city_name, "mf_based_models", model_file_name)
         model.save(self.spark_context, model_full_path)
-        print "{} saved!".format(model_file_name)
+        print ("{} saved!".format(model_file_name))
 
 
 def build_model_for_cities():
@@ -93,29 +92,12 @@ def build_model_for_cities():
             .appName(appName) \
             .getOrCreate()
 
-    # process all major cities
-    us_cities = [
-                    ("NC", "us_charlotte"), 
-                    ("NV", "us_lasvegas"), 
-                    ("WI", "us_madison"),
-                    ("AZ", "us_phoenix"), 
-                    ("PA", "us_pittsburgh"), 
-                    ("IL", "us_urbana_champaign")
-                ]
-    canada_cities = [("QC", "canada_montreal")]
-    germany_cities = [("BW", "germany_karlsruhe")]
-    uk_cities = [("EDH", "uk_edinburgh")]
-
-    cities = us_cities + canada_cities + germany_cities + uk_cities
-    city_names = [p[1] for p in cities]
-
-    base_dir = "/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/split_business_data_by_city/"
-    for city_name in city_names:
-        trainer = MFBasedRecommendationTrainer(city_name, base_dir, spark_context, sql_context, spark_session)
-        df_rdd = load_and_parse_ratingdata_for_city(city_name, base_dir, spark_session)
-        model = trainer.get_best_model(df_rdd)
-        trainer.export_model(model)
-
+    base_dir = "./data/"
+    
+    trainer = MFBasedRecommendationTrainer(base_dir, spark_context, sql_context, spark_session)
+    df_rdd = load_and_parse_ratingdata_for_city(base_dir, spark_session)
+    model = trainer.get_best_model(df_rdd)
+    trainer.export_model(model)
 
 if __name__ == '__main__':
     build_model_for_cities()

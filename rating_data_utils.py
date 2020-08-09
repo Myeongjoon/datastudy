@@ -3,18 +3,16 @@ import json
 from pyspark.sql import Row
 from pyspark.sql import SQLContext
 from pyspark.sql.types import *
-
+USER_REVIEW_DATA = "yelp_academic_dataset_review.json"
 # ---------------------------------------------------------------------------
 class RatingDataBuilderForCity:
-
-    def __init__(self, city_name, base_dir, spark_context):
-        self.city_name = city_name
+    def __init__(self, base_dir, spark_context):
         self.base_dir = base_dir
         self.spark_context = spark_context
 
     def __get_indexed_business_ids_for_city(self, bizid_to_index_map):
         file_name = "{}_business.csv".format(self.city_name)
-        full_path = os.path.join(self.base_dir, self.city_name, file_name)
+        full_path = os.path.join(self.base_dir, file_name)
         with open(full_path, "r") as f:
             lines = f.readlines()
 
@@ -42,7 +40,7 @@ class RatingDataBuilderForCity:
         joined = tuple_df_entire_biz.join(b_df, tuple_df_entire_biz.business_id==b_df.business_id_in_one_city, 'inner')
         df_tuple_for_one_city = joined.select('user_id', 'business_id', 'star')
 
-        file_name = "userid_businessid_star_tuple.csv"
+        file_name = USER_REVIEW_DATA
         csv_full_path = os.path.join(self.base_dir, self.city_name, file_name)
 
         print ("write tuple to {}".format(csv_full_path))
@@ -108,10 +106,9 @@ def build_rating_df_for_all_cities(spark_context, sql_context,
     return parsed_ratingdata_for_all_cities
 
 # ---------------------------------------------------------------------------
-def load_and_parse_ratingdata_for_city(city_name, base_dir, spark_session):
-        # load data for one city
-        file_name = "userid_businessid_star_tuple.csv"
-        csv_full_path = os.path.join(base_dir, city_name, file_name)
+def load_and_parse_ratingdata_for_city(base_dir, spark_session):
+        file_name = USER_REVIEW_DATA
+        csv_full_path = os.path.join(base_dir, file_name)
 
         ratingSchema = StructType([StructField("user_id", IntegerType(), True),
                                    StructField("business_id", IntegerType(), True),
