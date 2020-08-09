@@ -14,8 +14,7 @@ class MFBasedRecommendationTrainer:
         self.spark_context = spark_context
         self.sql_context = sql_context
 
-    def __split_data(self, df_rdd): 
-        # split rating data it into train, validation, and test datasets
+    def __split_data(self, df_rdd):
         training_RDD, validation_RDD, test_RDD = df_rdd.randomSplit([6, 2, 2], seed=0)
         validation_for_predict_RDD = validation_RDD.map(lambda x: (x[0], x[1]))
         test_for_predict_RDD = test_RDD.map(lambda x: (x[0], x[1]))
@@ -59,7 +58,6 @@ class MFBasedRecommendationTrainer:
         print (predictions.take(3))
         print (rates_and_preds.take(3))
 
-        # get the testing data RMSE
         best_model = ALS.train(training_RDD, best_rank, seed=seed, iterations=iterations,
                               lambda_=regularization_parameter)
         predictions = best_model.predictAll(test_for_predict_RDD).map(lambda r: ((r[0], r[1]), r[2]))
@@ -69,15 +67,14 @@ class MFBasedRecommendationTrainer:
         return best_model
 
     def export_model(self, model):
-        # Note! if error occurs, delete the file "~/metastore_db/*.lck"
         model_file_name = "business_recomm_model"
         model_full_path = os.path.join(self.base_dir, "mf_based_models", model_file_name)
         model.save(self.spark_context, model_full_path)
         print ("{} saved!".format(model_file_name))
 
 
-def build_model_for_cities():
-    appName = "mf_based_trainer app"
+def build_model():
+    appName = "mf based trainer app"
 
     conf = SparkConf().setAppName(appName).setMaster("local")
     spark_context = SparkContext(conf=conf)
@@ -97,7 +94,7 @@ def build_model_for_cities():
     trainer.export_model(model)
 
 if __name__ == '__main__':
-    build_model_for_cities()
+    build_model()
 
     
 
