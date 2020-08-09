@@ -17,7 +17,7 @@ bizid_to_index_map = load_bizid_to_index_map()
 
 parsed_ratingdata_all_cities = build_rating_df_for_all_cities(sc, sqlContext, userid_to_index_map, bizid_to_index_map)
 
-base_dir = "/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/split_business_data_by_city/"
+base_dir = "./data/yelp_data/split_business_data_by_city/"
 
 # process all major cities
 us_cities = [

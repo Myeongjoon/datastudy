@@ -58,13 +58,13 @@ class RatingDataBuilderForCity:
 
 # ---------------------------------------------------------------------------
 def load_userid_to_index_map():
-    with open('/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/userid_to_index_map.json', 'r') as fp:
+    with open('./data/yelp_data/userid_to_index_map.json', 'r') as fp:
         userid_to_index_map = json.load(fp)
         print ("userid_to_index_map json file loaded!")
     return userid_to_index_map
 
 def load_bizid_to_index_map():
-    with open('/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/bizid_to_index_map.json', 'r') as fp:
+    with open('./data/yelp_data/bizid_to_index_map.json', 'r') as fp:
         bizid_to_index_map = json.load(fp)
         print ("json file loaded!")
     return bizid_to_index_map
@@ -73,7 +73,7 @@ def load_bizid_to_index_map():
 def build_rating_df_for_all_cities(spark_context, sql_context,
                                    userid_to_index_map, bizid_to_index_map):
     # load the saved review csv file
-    review_data_dir = "/Users/sundeepblue/Bootcamp/allweek/week9/capstone/data/yelp_data/split_review_data"
+    review_data_dir = "./data/yelp_data/split_review_data"
     csv_file_name = "full_userId_businessId_star_tuple.csv"
     rating_raw_data = spark_context.textFile(os.path.join(review_data_dir, csv_file_name))
 
