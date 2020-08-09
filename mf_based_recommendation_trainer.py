@@ -1,9 +1,7 @@
 import os
 import math
-from pyspark.sql import Row
 from review_data_utils import *
 from pyspark.sql import SparkSession
-#from pyspark.sql.types import *
 from pyspark.sql import SQLContext
 from pyspark import SparkContext, SparkConf
 from pyspark.mllib.recommendation import ALS
@@ -48,7 +46,7 @@ class MFBasedRecommendationTrainer:
             model = ALS.train(training_RDD, rank, seed=seed, iterations=iterations,
                               lambda_=regularization_parameter)
             predictions = model.predictAll(validation_for_predict_RDD).map(lambda r: ((r[0], r[1]), r[2]))
-            rates_and_preds = validation_RDD.map(lambda r: ((int(r[0]), int(r[1])), float(r[2]))).join(predictions)
+            rates_and_preds = validation_RDD.map(lambda r: ((float(r[0]), float(r[1])), float(r[2]))).join(predictions)
             error = math.sqrt(rates_and_preds.map(lambda r: (r[1][0] - r[1][1])**2).mean())
             errors[err] = error
             err += 1
@@ -65,22 +63,21 @@ class MFBasedRecommendationTrainer:
         best_model = ALS.train(training_RDD, best_rank, seed=seed, iterations=iterations,
                               lambda_=regularization_parameter)
         predictions = best_model.predictAll(test_for_predict_RDD).map(lambda r: ((r[0], r[1]), r[2]))
-        rates_and_preds = test_RDD.map(lambda r: ((int(r[0]), int(r[1])), float(r[2]))).join(predictions)
+        rates_and_preds = test_RDD.map(lambda r: ((float(r[0]), float(r[1])), float(r[2]))).join(predictions)
         error = math.sqrt(rates_and_preds.map(lambda r: (r[1][0] - r[1][1])**2).mean())
         print ('For testing data the RMSE is %s' % (error))
         return best_model
 
     def export_model(self, model):
-        # export model to specific city
         # Note! if error occurs, delete the file "~/metastore_db/*.lck"
-        model_file_name = "business_recomm_model_for_{}".format(self.city_name)
-        model_full_path = os.path.join(self.base_dir, self.city_name, "mf_based_models", model_file_name)
+        model_file_name = "business_recomm_model"
+        model_full_path = os.path.join(self.base_dir, "mf_based_models", model_file_name)
         model.save(self.spark_context, model_full_path)
         print ("{} saved!".format(model_file_name))
 
 
 def build_model_for_cities():
-    appName = "Yelper Recommendation System Trainer"
+    appName = "mf_based_trainer app"
 
     conf = SparkConf().setAppName(appName).setMaster("local")
     spark_context = SparkContext(conf=conf)
@@ -95,7 +92,7 @@ def build_model_for_cities():
     base_dir = "./data/"
     
     trainer = MFBasedRecommendationTrainer(base_dir, spark_context, sql_context, spark_session)
-    df_rdd = load_and_parse_ratingdata_for_city(base_dir, spark_session)
+    df_rdd = load_and_parse_review_data(base_dir, spark_session)
     model = trainer.get_best_model(df_rdd)
     trainer.export_model(model)
 
