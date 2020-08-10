@@ -1,4 +1,3 @@
-import os
 from pyspark.mllib.recommendation import MatrixFactorizationModel
 
 class MFBasedRecommender:
@@ -9,18 +8,3 @@ class MFBasedRecommender:
         
     def recommend_business_for_user(self, model, user_id, topk=100):
         return model.recommendProducts(user_id, topk)
-
-def load_model(spark_context, recommender):
-    base_dir = "./data/yelp_data/split_business_data_by_city/"
-    city_name = "us_charlotte"
-    model_file_name = "business_recomm_model_for_{}".format(city_name)
-    model_full_path = os.path.join(base_dir, city_name, "mf_based_models", model_file_name)
-    model = recommender.load_mf_model(spark_context, model_full_path)
-    return model
-
-def recommend_for_one_user(spark_context, rec):
-    model = load_model(spark_context, rec)
-    user_id = 10336396
-    print (rec.recommend_business_for_user(model, user_id, topk=50))
-
-
