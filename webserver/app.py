@@ -129,7 +129,7 @@ def get_recommended_businesses(user_id, city_name, topk, keywords):
     if len(lat_list) == 0:
         return "There was no business found! Please use other keywords and retry. Hopefully you'll get something."
 
-    print categories_list
+    print (categories_list)
     return render_template("map.html", 
                 page_title="Get your recommendations",
                 lat_list=lat_list,
@@ -149,7 +149,7 @@ def load_city_based_models_and_businesses(spark_context, city_name):
     recommender = MFBasedRecommender(spark_context, model_path)
     model = recommender.load_mf_model()
     richer_biz_info = load_richer_biz_info(city_name)
-    print "City-based models and business data were loaded!"
+    print ("City-based models and business data were loaded!")
 
 def create_app(spark_context):    
     global current_city_name
