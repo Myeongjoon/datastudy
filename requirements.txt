@@ -1,4 +1,6 @@
 pandas
-
+wsgiserver
+paste
+cherrypy
 flask
 pyspark
