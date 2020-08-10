@@ -28,11 +28,9 @@ class MFBasedRecommendationTrainer:
         ranks = [4, 8, 12]
         errors = [0, 0, 0]
         err = 0
-        tolerance = 0.02
 
         min_error = float('inf')
         best_rank = -1
-        best_iteration = -1
 
         sp = self.__split_data(df_rdd)
         training_RDD = sp[0]
@@ -78,7 +76,6 @@ def build_model():
 
     conf = SparkConf().setAppName(appName).setMaster("local")
     spark_context = SparkContext(conf=conf)
-    # sc.setLogLevel("WARN") # config log level to make console less verbose
     sql_context = SQLContext(spark_context)
 
     spark_session = SparkSession.builder \

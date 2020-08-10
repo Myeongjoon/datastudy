@@ -4,12 +4,9 @@ import hashlib
 from pyspark.sql import SparkSession
 from pyspark.sql import SQLContext
 from pyspark import SparkContext, SparkConf
-from pyspark.sql.functions import monotonically_increasing_id
-from pyspark.sql import Row
-from pyspark.sql.types import StructField, StructType, LongType
 
-USER_REVIEW_DATA = "yelp_academic_dataset_review.json"
-#USER_REVIEW_DATA = "yelp_academic_dataset_review_small.json"
+#USER_REVIEW_DATA = "yelp_academic_dataset_review.json"
+USER_REVIEW_DATA = "yelp_academic_dataset_review_small.json"
 def load_and_parse_review_data(base_dir,spark_session,file_name = USER_REVIEW_DATA):
 
     json_full_path = os.path.join(base_dir, file_name)

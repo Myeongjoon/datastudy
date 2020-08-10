@@ -1,5 +1,4 @@
 import os
-from pyspark import SparkContext, SparkConf
 from pyspark.mllib.recommendation import MatrixFactorizationModel
 
 class MFBasedRecommender:
@@ -23,12 +22,5 @@ def recommend_for_one_user(spark_context, rec):
     model = load_model(spark_context, rec)
     user_id = 10336396
     print (rec.recommend_business_for_user(model, user_id, topk=50))
-
-# appName = "Yelper Recommendation System Trainer"
-# conf = SparkConf().setAppName(appName).setMaster("local")
-# spark_context = SparkContext(conf=conf)
-# rec = MFBasedRecommender()
-# recommend_for_one_user(spark_context, rec)
-
 
 
