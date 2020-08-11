@@ -7,7 +7,7 @@ from pyspark import SparkContext, SparkConf
 from pyspark.mllib.recommendation import ALS
 
 
-class MFBasedRecommendationTrainer:
+class RecommendationTrainer:
 
     def __init__(self, base_dir, spark_context, sql_context, spark_session):
         self.base_dir = base_dir
@@ -72,7 +72,7 @@ class MFBasedRecommendationTrainer:
 
 
 def build_model():
-    appName = "mf based trainer app"
+    appName = "Recommendation trainer app"
 
     conf = SparkConf().setAppName(appName).setMaster("local")
     spark_context = SparkContext(conf=conf)
@@ -85,7 +85,7 @@ def build_model():
 
     base_dir = "./data/"
     
-    trainer = MFBasedRecommendationTrainer(base_dir, spark_context, sql_context, spark_session)
+    trainer = RecommendationTrainer(base_dir, spark_context, sql_context, spark_session)
     df_rdd = load_and_parse_review_data(base_dir, spark_session)
     model = trainer.get_best_model(df_rdd)
     trainer.export_model(model)

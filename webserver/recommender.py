@@ -1,6 +1,6 @@
 from pyspark.mllib.recommendation import MatrixFactorizationModel
 
-class MFBasedRecommender:
+class Recommender:
 
     def __init__(self, spark_context, model_path):
         self.spark_context = spark_context

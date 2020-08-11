@@ -5,7 +5,7 @@ from pyspark import SparkContext, SparkConf
 
 def init_spark_context():
     conf = SparkConf().setAppName("yelp data recommender")
-    sc = SparkContext(conf=conf, pyFiles=['mf_based_recommender.py', 'app.py'])
+    sc = SparkContext(conf=conf, pyFiles=['recommender.py', 'app.py'])
     return sc
 
 def run_server(app):
